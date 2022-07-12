@@ -265,11 +265,12 @@ new_images = from_image_to_thumbnail(verified_images)
 uploaded_images = upload_objects_to_s3(new_images, output_bucket)
 
 tag_s3_objects(uploaded_images,bucket_of_images)
-insert_to_rds(host=host,user=username,password=password,table=table,database=db_name)
 
 upload_log(log_name=log_file_name, bucket_name=bucket_of_images)
 if no_error_in_runtime is True:
     lecho("There were errors during run time please check the log file")
     send_mail(destination_mail="tomcoh5@gmail.com",bucket_of_log=bucket_of_images,log_name=log_file_name)
 else:
+    insert_to_rds(host=host, user=username, password=password, table=table, database=db_name,dict_of_images=uploaded_images)
     lecho("No error durning runtime")
+create_static_html_page()
