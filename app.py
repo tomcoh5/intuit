@@ -201,28 +201,31 @@ def send_mail(destination_mail, bucket_of_log,log_name):
 
 
 def insert_to_rds(host,user,password,database,table,dict_of_images):
-
-    mydb = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database
-    )
-
-    mycursor = mydb.cursor()
-
-    list_of_tuples = []
-    for thumbnail , list_of_props in dict_of_images.items():
-
-        new_tuple = (thumbnail, list_of_props[0], list_of_props[1], list_of_props[2], list_of_props[3])
-        list_of_tuples.append(new_tuple)
-
-    sql = f"INSERT INTO {table} (thumbnail_image_name, image_name, image_size, readable_thumbnail_file_size, file_uploaded_date) VALUES {list_of_tuples}"
-
-    mycursor.execute(sql)
-
-    mydb.commit()
-    lecho("record inserted")
+    try: 
+        mydb = mysql.connector.connect(
+            host=host,
+            user=user,
+            password=password,
+            database=database
+        )
+        lecho(f"connected to {host} in {database}")
+        mycursor = mydb.cursor()
+    
+        list_of_tuples = []
+        for thumbnail , list_of_props in dict_of_images.items():
+    
+            new_tuple = (thumbnail, list_of_props[0], list_of_props[1], list_of_props[2], list_of_props[3])
+            list_of_tuples.append(new_tuple)
+    
+        sql = f"INSERT INTO {table} (thumbnail_image_name, image_name, image_size, readable_thumbnail_file_size, file_uploaded_date) VALUES {list_of_tuples}"
+    
+        mycursor.execute(sql)
+    
+        mydb.commit()
+        lecho("record inserted")
+        
+    except Exception as e:
+        lecho(f" failed to insert to the database {e}")
 
 
 def create_static_html_page(title="static website for images",bucket_name=""):
